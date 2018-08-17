@@ -7,7 +7,6 @@ import okhttp3.FormBody
 import okhttp3.HttpUrl
 import okhttp3.Request
 import okhttp3.Response
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 
 enum class Method {
@@ -30,7 +29,7 @@ open class WXRequest(val uri: String, val method: Method)
  * 微信请求对象字段注解
  * @author Memory_Leak<irealing@163.com>
  * */
-@Target(AnnotationTarget.FIELD)
+@Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class WXRequestFiled(val key: String)
 
@@ -70,16 +69,28 @@ class WXRequestParser<in T : WXRequest> : RequestParser<T> {
         val iter = o::class.memberProperties.iterator()
         while (iter.hasNext()) {
             val filed = iter.next()
-            println(filed.name)
-            val cfg = filed.findAnnotation<WXRequestFiled>() ?: continue
+            val cfg = filed.annotations.find { it.annotationClass == WXRequestFiled::class }as? WXRequestFiled ?: continue
             ret[cfg.key] = filed.getter.call(o)?.toString() ?: ""
         }
         return ret
     }
 }
 
-class TextRespParser : ResponseParser<String> {
-    override fun parse(resp: Response): String {
-        return resp.body()?.string() ?: ""
+/**
+ * 基础文本消息转换工具
+ * */
+open class BaseTextRespParser : ResponseParser<Map<String, String>> {
+    open override fun parse(resp: Response): Map<String, String> {
+        val ret = mutableMapOf<String, String>()
+        val text = resp.body()?.string() ?: throw NetError("空的返回结果:%s".format(resp.request().url().toString()))
+        text.split(";").forEach {
+            val i = it.indexOf("=")
+            if (i < 0) return@forEach
+            val k = it.substring(0, i).trim()
+            var v = it.substring(i + 1).trim()
+            if (v.startsWith("\"")) v = v.substring(1, v.length - 1)
+            ret[k] = v
+        }
+        return ret
     }
 }

@@ -26,6 +26,7 @@ object NetLoader {
 
     fun <Q, R> load(q: Q, qp: RequestParser<Q>, rp: ResponseParser<R>, handleStatus: Boolean = false): R {
         val req = qp.parse(q)
+        println(req.url().toString())
         val resp = http.newCall(req).execute() ?: throw NetError("请求失败!")
         if (handleStatus && !resp.isSuccessful) throw NetError("请求异常:{}".format(resp.code()))
         return rp.parse(resp)
