@@ -1,6 +1,9 @@
 package cn.fuser.vx.wxbot
 
 class GetUUID : WXRequest("https://login.wx.qq.com/jslogin", Method.GET) {
+    /**
+     * 获取登录UUID
+     * */
     @WXRequestFiled("appid")
     val appID = "wx782c26e4c19acffb"
     @WXRequestFiled("redirect_uri")

@@ -11,11 +11,25 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 
 enum class Method {
-    GET, POST
+    /**
+     * HTTP请求方式
+     * GET,POST
+     * @author Memory_Leak<irealing@163.com>
+     * */
+    GET,
+    POST
 }
 
-
+/**
+ * 微信请求对象基类
+ * @author Memory_Leak<irealing@163.com>
+ * */
 open class WXRequest(val uri: String, val method: Method)
+
+/**
+ * 微信请求对象字段注解
+ * @author Memory_Leak<irealing@163.com>
+ * */
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class WXRequestFiled(val key: String)
