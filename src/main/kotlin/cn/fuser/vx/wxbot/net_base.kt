@@ -79,8 +79,9 @@ class WXRequestParser<in T : WXRequest> : RequestParser<T> {
 /**
  * 基础文本消息转换工具
  * */
-open class BaseTextRespParser : ResponseParser<Map<String, String>> {
-    open override fun parse(resp: Response): Map<String, String> {
+abstract class BaseTextRespParser<out T> : ResponseParser<T> {
+    abstract override fun parse(resp: Response): T
+    protected fun parseMap(resp: Response): Map<String, String> {
         val ret = mutableMapOf<String, String>()
         val text = resp.body()?.string() ?: throw NetError("空的返回结果:%s".format(resp.request().url().toString()))
         text.split(";").forEach {
@@ -93,4 +94,8 @@ open class BaseTextRespParser : ResponseParser<Map<String, String>> {
         }
         return ret
     }
+}
+
+class MapRespParser : BaseTextRespParser<Map<String, String>>() {
+    override fun parse(resp: Response): Map<String, String> = parseMap(resp)
 }
