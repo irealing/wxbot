@@ -26,6 +26,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     compile 'com.squareup.okhttp3:okhttp:3.11.0'
+    compile "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
