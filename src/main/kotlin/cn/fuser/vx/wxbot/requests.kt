@@ -38,22 +38,27 @@ class LoginStatus(uuid: UUIDReply) : WXRequest("https://login.wx.qq.com/cgi-bin/
     val reverse = time.inv()
 }
 
-class WXInit(uin: String, sid: String) {
+class WXInit(uin: String, sid: String, skey: String) {
     /**
      * 初始化微信信息请求
      * */
-    class Request(@JSONField(name = "Uin") val uin: String, @JSONField(name = "Sid") val sid: String) {
+    class Request(@JSONField(name = "Uin") val uin: String, @JSONField(name = "Sid") val sid: String, @JSONField(name = "Skey") val skey: String) {
         @JSONField(name = "DeviceID")
-        val deviceID = String.format("e%s", uin.toLong().inv().toString())
-        @JSONField(name = "Skey")
-        val skey = ""
+        val deviceID: String = device()
+
+        private fun device(): String {
+            var n = uin.toLong().inv()
+            if (n < 0) n = -n
+            return String.format("e%s", n.toString())
+        }
     }
 
-    val baseRequest = Request(uin, sid)
+    @JSONField(name = "BaseRequest")
+    val baseRequest = Request(uin, sid, skey)
 }
 
-class WXInitRequest(private val reply: LoginReply) : JSONRequest<WXInit>("", Method.POST, WXInit(reply.wxuin, reply.wxsid)) {
-    private val target = "https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxinit?r=%d&lang=zh_CN&pass_ticket=%s"
+class WXInitRequest(private val reply: LoginReply) : JSONRequest<WXInit>("", Method.POST, WXInit(reply.wxuin, reply.wxsid, reply.skey)) {
+    private val target = "https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxinit?r=%d&lang=zh_CN&pass_ticket=%s"
     override val uri: String
         get() = target.format((System.currentTimeMillis() / 1000).inv(), reply.ticket)
 }

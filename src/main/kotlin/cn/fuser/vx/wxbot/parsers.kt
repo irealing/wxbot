@@ -17,7 +17,7 @@ class UUIDParser : BaseTextRespParser<UUIDReply>() {
 
 class QRCodeParser : ResponseParser<String> {
     override fun parse(resp: Response): String {
-        val filename = "%d.jpg".format(System.currentTimeMillis())
+        val filename = "qr_%d.jpg".format(System.currentTimeMillis())
         val output = FileOutputStream(filename)
         output.write(resp.body()?.bytes())
         return filename
