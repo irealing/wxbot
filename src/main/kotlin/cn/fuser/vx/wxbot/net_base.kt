@@ -22,7 +22,7 @@ enum class Method {
  * 微信请求对象基类
  * @author Memory_Leak<irealing@163.com>
  * */
-open class WXRequest(val uri: String, val method: Method)
+open class WXRequest(open val uri: String, val method: Method)
 
 /**
  * JSON请求对象

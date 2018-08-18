@@ -54,5 +54,10 @@ class WXInit(uin: String, sid: String) {
 
 class WXInitRequest(reply: LoginReply) : JSONRequest<WXInit>("", Method.POST, WXInit(reply.wxuin, reply.wxsid)) {
     override val uri: String
-        get() = "https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxinit?r=%d".format(System.currentTimeMillis() / 1000)
+        get() = "https://wx.qq.com/cgi-bin/mmwebwx-bin/webwxinit?r=%d".format((System.currentTimeMillis() / 1000).inv())
+}
+
+class LoginRequest(uri: String) : WXRequest(uri, Method.GET) {
+    override val uri
+        get() = "%s&fun=new".format(super.uri)
 }

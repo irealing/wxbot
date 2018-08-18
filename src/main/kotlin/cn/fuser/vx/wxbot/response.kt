@@ -26,4 +26,4 @@ class ScanStatus(data: Map<String, String>) : TextReply(data) {
     val success = code == 200
 }
 
-data class LoginReply(val wxuin: String, val wxsid: String)
+data class LoginReply(val wxuin: String, val wxsid: String, val ticket: String, val skey: String)
