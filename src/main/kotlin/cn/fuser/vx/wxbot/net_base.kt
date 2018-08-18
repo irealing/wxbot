@@ -1,12 +1,11 @@
 package cn.fuser.vx.wxbot
 
+import cn.fuser.tool.net.FormatError
 import cn.fuser.tool.net.NetError
 import cn.fuser.tool.net.RequestParser
 import cn.fuser.tool.net.ResponseParser
-import okhttp3.FormBody
-import okhttp3.HttpUrl
-import okhttp3.Request
-import okhttp3.Response
+import com.alibaba.fastjson.JSON
+import okhttp3.*
 import kotlin.reflect.full.memberProperties
 
 enum class Method {
@@ -24,6 +23,12 @@ enum class Method {
  * @author Memory_Leak<irealing@163.com>
  * */
 open class WXRequest(val uri: String, val method: Method)
+
+/**
+ * JSON请求对象
+ * @author Memory_Leak<irealing@163.com>
+ * */
+open class JSONRequest<out T>(open val uri: String, val method: Method, val data: T)
 
 /**
  * 微信请求对象字段注解
@@ -98,4 +103,22 @@ abstract class BaseTextRespParser<out T> : ResponseParser<T> {
 
 class MapRespParser : BaseTextRespParser<Map<String, String>>() {
     override fun parse(resp: Response): Map<String, String> = parseMap(resp)
+}
+
+class TextRespParser : ResponseParser<String> {
+    override fun parse(resp: Response): String = resp.body()?.string() ?: throw FormatError("empty response")
+}
+
+class WXJSONReqParser<in T> : RequestParser<JSONRequest<T>> {
+    /**
+     * 生成JSON 请求
+     * */
+    private val jsonType = MediaType.parse("application/json; charset=utf-8")
+
+    override fun parse(o: JSONRequest<T>): Request {
+        val builder = Request.Builder().url(o.uri)
+        val json = JSON.toJSONString(o.data) ?: throw FormatError("failed to parse object to JSON string")
+        val body = RequestBody.create(jsonType, json) ?: throw FormatError("build RequestBody error")
+        return builder.post(body).build()
+    }
 }
