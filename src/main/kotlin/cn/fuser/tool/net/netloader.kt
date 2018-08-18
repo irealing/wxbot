@@ -3,6 +3,7 @@ package cn.fuser.tool.net
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import java.util.concurrent.TimeUnit
 
 interface RequestParser<in T> {
     /**
@@ -22,7 +23,8 @@ object NetLoader {
     /**
      * HTTP请求工具
      * */
-    private val http = OkHttpClient()
+    private val readTimeout: Long = 30
+    private val http = OkHttpClient.Builder().readTimeout(readTimeout, TimeUnit.SECONDS).build()
     fun <Q, R> load(q: Q, qp: RequestParser<Q>, rp: ResponseParser<R>, handleStatus: Boolean = false): R {
         val req = qp.parse(q)
         val resp = http.newCall(req).execute() ?: throw NetError("请求失败!")
