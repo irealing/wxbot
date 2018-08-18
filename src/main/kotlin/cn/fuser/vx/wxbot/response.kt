@@ -22,6 +22,8 @@ class UUIDReply(data: Map<String, String>) : TextReply(data) {
 
 class ScanStatus(data: Map<String, String>) : TextReply(data) {
     val code = int("window.code")
-    val redirectURI = int("window.redirect_uri")
+    val redirectURI = string("window.redirect_uri")
     val success = code == 200
 }
+
+data class LoginReply(val wxuin: String, val wxsid: String)
