@@ -1,4 +1,4 @@
-package cn.fuser.vx.wxbot
+package cn.fuser.vx.wxbot.ex
 
 import com.alibaba.fastjson.annotation.JSONField
 

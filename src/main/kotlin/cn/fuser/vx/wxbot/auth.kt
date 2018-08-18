@@ -2,6 +2,7 @@ package cn.fuser.vx.wxbot
 
 import cn.fuser.tool.net.NetLoader
 import cn.fuser.tool.net.ResponseParser
+import cn.fuser.vx.wxbot.ex.*
 import org.apache.log4j.Logger
 
 class AuthException(message: String) : Exception(message)

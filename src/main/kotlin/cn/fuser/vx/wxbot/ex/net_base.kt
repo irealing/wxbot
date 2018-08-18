@@ -1,4 +1,4 @@
-package cn.fuser.vx.wxbot
+package cn.fuser.vx.wxbot.ex
 
 import cn.fuser.tool.net.FormatError
 import cn.fuser.tool.net.NetError

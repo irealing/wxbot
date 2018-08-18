@@ -1,4 +1,4 @@
-package cn.fuser.vx.wxbot
+package cn.fuser.vx.wxbot.ex
 
 open class TextReply(private val data: Map<String, String>) {
     /**
