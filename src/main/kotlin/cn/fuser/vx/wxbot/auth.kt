@@ -2,11 +2,11 @@ package cn.fuser.vx.wxbot
 
 import cn.fuser.tool.net.NetLoader
 import cn.fuser.tool.net.ResponseParser
-import cn.fuser.vx.wxbot.ex.*
+import cn.fuser.vx.wxbot.auth.*
 import org.apache.log4j.Logger
 
 class AuthException(message: String) : Exception(message)
-class AuthValidater {
+class AuthValidator {
     private fun getUUID(): UUIDReply = NetLoader.load(GetUUID(), WXRequestParser(), UUIDParser())
     private fun getQRCode(uuid: UUIDReply): String = NetLoader.load(GetQRCode(uuid), WXRequestParser(), QRCodeParser())
     private val logger = Logger.getLogger(this::class.simpleName)

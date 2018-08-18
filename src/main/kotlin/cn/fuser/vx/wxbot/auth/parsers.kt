@@ -1,9 +1,10 @@
-package cn.fuser.vx.wxbot.ex
+package cn.fuser.vx.wxbot.auth
 
 import cn.fuser.tool.net.NetError
 import cn.fuser.tool.net.NetLoader
 import cn.fuser.tool.net.ResponseParser
 import cn.fuser.vx.wxbot.AuthException
+import cn.fuser.vx.wxbot.BaseTextRespParser
 import okhttp3.Response
 import org.apache.log4j.Logger
 import java.io.FileOutputStream

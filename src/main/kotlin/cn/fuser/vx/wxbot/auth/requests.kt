@@ -1,5 +1,9 @@
-package cn.fuser.vx.wxbot.ex
+package cn.fuser.vx.wxbot.auth
 
+import cn.fuser.vx.wxbot.JSONRequest
+import cn.fuser.vx.wxbot.Method
+import cn.fuser.vx.wxbot.WXRequest
+import cn.fuser.vx.wxbot.WXRequestFiled
 import com.alibaba.fastjson.annotation.JSONField
 
 /**

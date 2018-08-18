@@ -1,4 +1,6 @@
-package cn.fuser.vx.wxbot.ex
+package cn.fuser.vx.wxbot.auth
+
+import com.alibaba.fastjson.annotation.JSONField
 
 open class TextReply(private val data: Map<String, String>) {
     /**
@@ -28,4 +30,21 @@ class ScanStatus(data: Map<String, String>) : TextReply(data) {
 
 data class LoginReply(val wxuin: String, val wxsid: String, val ticket: String, val skey: String, val config: Config) {
     data class Config(val host: String)
+}
+
+data class SyncKey(@JSONField(name = "Key") val key: Int, @JSONField(name = "Val") val value: Long)
+
+data class SyncCheckKey(@JSONField(name = "Count") val count: Int, @JSONField(name = "List") val list: List<SyncKey>)
+
+fun SyncCheckKey.syncKey(): String {
+    val builder = StringBuilder()
+    var tag = false
+    this.list.forEach {
+        if (tag)
+            builder.append("|")
+        else
+            tag = true
+        builder.append("%s_%s".format(it.key, it.value))
+    }
+    return builder.toString()
 }
