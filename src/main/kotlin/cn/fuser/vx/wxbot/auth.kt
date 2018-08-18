@@ -11,7 +11,8 @@ class AuthValidater {
     private val logger = Logger.getLogger(this::class.simpleName)
     fun validate(): LoginReply {
         val uuid = getUUID()
-        getQRCode(uuid)
+        val qrFile = getQRCode(uuid)
+        logger.warn("PLEASE SCAN QR-CODE FILE %s".format(qrFile))
         return waitLogin(uuid)
     }
 

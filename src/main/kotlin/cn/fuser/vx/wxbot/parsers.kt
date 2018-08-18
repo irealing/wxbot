@@ -34,6 +34,7 @@ class LoginRespParser : ResponseParser<LoginReply> {
     private val logger = Logger.getLogger(this::class.simpleName)
     override fun parse(resp: Response): LoginReply {
         val body = resp.body()?.string()
+        val host = resp.request().url().host() ?: ""
         logger.debug(body)
         val ticket = ticketRegex.matcher(body)
         val skey = skeyRegex.matcher(body)
@@ -41,6 +42,6 @@ class LoginRespParser : ResponseParser<LoginReply> {
         val cookies = NetLoader.queryCookie(resp.request().url())
         val uin = cookies.find { it.name() == "wxuin" }?.value() ?: throw AuthException("uin not found")
         val sid = cookies.find { it.name() == "wxsid" }?.value() ?: throw AuthException("sid not found")
-        return LoginReply(uin, sid, ticket.group(1), skey.group(1))
+        return LoginReply(uin, sid, ticket.group(1), skey.group(1), config = LoginReply.Config(host))
     }
 }

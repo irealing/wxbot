@@ -58,9 +58,9 @@ class WXInit(uin: String, sid: String, skey: String) {
 }
 
 class WXInitRequest(private val reply: LoginReply) : JSONRequest<WXInit>("", Method.POST, WXInit(reply.wxuin, reply.wxsid, reply.skey)) {
-    private val target = "https://wx2.qq.com/cgi-bin/mmwebwx-bin/webwxinit?r=%d&lang=zh_CN&pass_ticket=%s"
+    private val target = "https://%s/cgi-bin/mmwebwx-bin/webwxinit?r=%d&lang=zh_CN&pass_ticket=%s"
     override val uri: String
-        get() = target.format((System.currentTimeMillis() / 1000).inv(), reply.ticket)
+        get() = target.format(reply.config.host, (System.currentTimeMillis() / 1000).inv(), reply.ticket)
 }
 
 class LoginRequest(uri: String) : WXRequest(uri, Method.GET) {
