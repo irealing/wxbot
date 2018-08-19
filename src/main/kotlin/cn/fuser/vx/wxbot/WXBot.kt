@@ -6,6 +6,9 @@ import cn.fuser.vx.wxbot.auth.*
 import com.alibaba.fastjson.JSON
 import org.apache.log4j.Logger
 
+/**
+ * 微信机器人
+ * */
 class WXBot(private val authInfo: AuthInfo) {
     private val syncKey: SyncCheckKey = SyncCheckKey(0, mutableListOf())
     var shutDown = false
@@ -14,6 +17,7 @@ class WXBot(private val authInfo: AuthInfo) {
     private val user = initBot()
     val messageFactory: MessageFactory
         get() = MessageFactory.create(user)
+    private val messageCallback = mutableListOf<MessageCallback>()
 
     private fun initBot(): User {
         /**
@@ -26,7 +30,7 @@ class WXBot(private val authInfo: AuthInfo) {
         return ret.user
     }
 
-    fun checkSync(): SyncCheckRet {
+    private fun checkSync(): SyncCheckRet {
         val r = NetLoader.load(SyncCheckRequest(authInfo, syncKey), WXRequestParser(), SyncCheckParser())
         if (r.retCode != 0) {
             this.shutdown()
@@ -44,6 +48,9 @@ class WXBot(private val authInfo: AuthInfo) {
         }
     }
 
+    /**
+     * 启动同步线程
+     * */
     fun heartbeat() {
         if (!syncTask.isAlive)
             syncTask.start()
@@ -53,13 +60,26 @@ class WXBot(private val authInfo: AuthInfo) {
         val syncParser = JSONRespParser({ JSON.parseObject(it, SyncRet::class.java) })
         val ret = NetLoader.loadJSON(WXSyncRequest(authInfo, this.syncKey), syncParser) ?: throw NetError("error response")
         this.syncKey.remake(ret.syncKey.list)
+        ret.msgList.forEach {
+            handleMessage(it)
+        }
         return ret.syncKey
     }
 
+    private fun handleMessage(m: Message) = this.messageCallback.forEach({ it.onMessage(m) })
+
+    /**
+     * 关闭后台同步线程
+     * */
     fun shutdown() {
         this.shutDown = true
     }
 
+    /**
+     * 发送消息
+     * @see WXMessage
+     * @param wm 简单消息
+     * */
     fun send(wm: WXMessage): SendRet {
         /**
          * 发送消息
@@ -74,5 +94,18 @@ class WXBot(private val authInfo: AuthInfo) {
          * */
         val parser = JSONRespParser({ JSON.parseObject(it, Contact::class.java) })
         return NetLoader.load(QueryContact(authInfo), WXRequestParser(), parser)
+    }
+
+    /**
+     * 注册Message处理Handler
+     * */
+    fun registerHandler(vararg callback: MessageCallback) = this.messageCallback.addAll(callback)
+
+    /**
+     * 收到消息回调
+     * @see Message
+     * */
+    interface MessageCallback {
+        fun onMessage(m: Message): Unit
     }
 }
