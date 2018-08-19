@@ -36,7 +36,7 @@ class WXBot(private val authInfo: AuthInfo) {
             this.shutdown()
             return r
         }
-        if (r.selector == 2) this.sync()
+        if (r.selector != 0) this.sync()
         return r
     }
 
@@ -57,7 +57,9 @@ class WXBot(private val authInfo: AuthInfo) {
     }
 
     private fun sync(): SyncCheckKey {
-        val syncParser = JSONRespParser({ JSON.parseObject(it, SyncRet::class.java) })
+        val syncParser = JSONRespParser({
+            JSON.parseObject(it, SyncRet::class.java)
+        })
         val ret = NetLoader.loadJSON(WXSyncRequest(authInfo, this.syncKey), syncParser) ?: throw NetError("error response")
         this.syncKey.remake(ret.syncKey.list)
         ret.msgList.forEach {
