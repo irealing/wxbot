@@ -7,6 +7,7 @@ import cn.fuser.tool.net.ResponseParser
 import com.alibaba.fastjson.JSON
 import okhttp3.*
 import org.apache.log4j.Logger
+import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 
@@ -33,7 +34,9 @@ open class WXRequest(open val uri: String, val method: Method)
  * JSON请求对象
  * @author Memory_Leak<irealing@163.com>
  * */
-open class JSONRequest<out T>(open val uri: String, val method: Method, val data: T)
+open class JSONRequest<out T>(open val uri: String, val method: Method, val data: T) {
+    constructor(raw: T) : this("", Method.POST, raw)
+}
 
 /**
  * 微信请求对象字段注解
@@ -142,5 +145,14 @@ class WXJSONReqParser<in T> : RequestParser<JSONRequest<T>> {
             urlBuilder.addQueryParameter(param.key, value)
         }
         return urlBuilder.build()
+    }
+}
+
+class JSONRespParser<out T>(private val converter: (String) -> T) : ResponseParser<T> {
+    private val logger = Logger.getLogger(this::class.simpleName)
+    override fun parse(resp: Response): T {
+        val text = resp.body()?.string() ?: throw NetError("empty response")
+        logger.debug("json response %s".format(text))
+        return this.converter(text)
     }
 }

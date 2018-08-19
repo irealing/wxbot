@@ -61,6 +61,9 @@ class SyncCheckKey(@JSONField(name = "Count") var count: Int, @JSONField(name = 
         this.count = this.list.size
         this.locker.unlock()
     }
+
+    fun validate(): Boolean = !this.list.isEmpty()
 }
 
 class BaseResponse(@JSONField(name = "Ret") val ret: Int, @JSONField(name = "ErrMsg") val errMsg: String)
+data class SyncCheckRet(val retCode: Int, val selector: Int)

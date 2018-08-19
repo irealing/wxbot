@@ -64,7 +64,7 @@ class LoginRequest(uri: String) : WXRequest(uri, Method.GET) {
         get() = "%s&fun=new".format(super.uri)
 }
 
-class SyncRequest(authInfo: AuthInfo, synk: SyncCheckKey) : WXRequest("", Method.GET) {
+class SyncCheckRequest(authInfo: AuthInfo, synk: SyncCheckKey) : WXRequest("", Method.GET) {
     private val urlFmt = "https://webpush.%s/cgi-bin/mmwebwx-bin/synccheck"
     override val uri: String = urlFmt.format(authInfo.config.host)
     @WXRequestFiled("_")
@@ -81,4 +81,28 @@ class SyncRequest(authInfo: AuthInfo, synk: SyncCheckKey) : WXRequest("", Method
     val device = Config.device
     @WXRequestFiled("synckey")
     val synckey = synk.syncKey()
+}
+
+class BaseRequest(authInfo: AuthInfo) {
+    @JSONField(name = "Uin")
+    val uin: String = authInfo.wxuin
+    @JSONField(name = "Sid")
+    val sid = authInfo.wxsid
+    @JSONField(name = "Skey")
+    val skey = authInfo.skey
+    @JSONField(name = "DeviceID")
+    val device = Config.device
+}
+
+data class WXSyncData(@JSONField(name = "BaseRequest") val baseRequest: BaseRequest, @JSONField(name = "SyncKey") val syncKey: SyncCheckKey) {
+    @JSONField(name = "rr")
+    val reverse = (System.currentTimeMillis() / 1000).inv()
+}
+
+class WXSyncRequest(authInfo: AuthInfo, syncKey: SyncCheckKey) : JSONRequest<WXSyncData>(WXSyncData(BaseRequest(authInfo), syncKey)) {
+    override val uri: String = "https://%s/cgi-bin/mmwebwx-bin/webwxsync".format(authInfo.config.host)
+    @WXRequestFiled("sid")
+    val sid = authInfo.wxsid
+    @WXRequestFiled("skey")
+    val skey = authInfo.skey
 }

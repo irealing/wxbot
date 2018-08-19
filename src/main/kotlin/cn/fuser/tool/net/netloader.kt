@@ -1,5 +1,8 @@
 package cn.fuser.tool.net
 
+import cn.fuser.vx.wxbot.JSONRequest
+import cn.fuser.vx.wxbot.JSONRespParser
+import cn.fuser.vx.wxbot.WXJSONReqParser
 import okhttp3.*
 import org.apache.log4j.Logger
 import java.net.CookieManager
@@ -48,4 +51,5 @@ object NetLoader {
     }
 
     fun queryCookie(url: HttpUrl): List<Cookie> = http.cookieJar().loadForRequest(url)
+    fun <Q, R> loadJSON(req: JSONRequest<Q>, parser: JSONRespParser<R>): R = load(req, WXJSONReqParser(), parser)
 }
