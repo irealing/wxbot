@@ -2,10 +2,10 @@ package cn.fuser.vx.wxbot;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
+/**
+ * 用户对象
+ */
 public class User {
-    /**
-     * 用户对象
-     */
     @JSONField(name = "AppAccountFlag")
     private int appAccountFlg;
     @JSONField(name = "ContactFlag")

@@ -6,7 +6,6 @@ import cn.fuser.tool.net.ResponseParser
 import cn.fuser.vx.wxbot.AuthException
 import cn.fuser.vx.wxbot.BaseTextRespParser
 import cn.fuser.vx.wxbot.InitReply
-import cn.fuser.vx.wxbot.TextRespParser
 import com.alibaba.fastjson.JSON
 import okhttp3.Response
 import org.apache.log4j.Logger

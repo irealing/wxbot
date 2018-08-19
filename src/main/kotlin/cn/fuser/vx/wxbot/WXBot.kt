@@ -67,4 +67,12 @@ class WXBot(private val authInfo: AuthInfo) {
         val parser = JSONRespParser({ JSON.parseObject(it, SendRet::class.java) })
         return NetLoader.loadJSON(SendMessage(authInfo, wm), parser)
     }
+
+    fun contact(): Contact {
+        /**
+         * 获取通讯录
+         * */
+        val parser = JSONRespParser({ JSON.parseObject(it, Contact::class.java) })
+        return NetLoader.load(QueryContact(authInfo), WXRequestParser(), parser)
+    }
 }

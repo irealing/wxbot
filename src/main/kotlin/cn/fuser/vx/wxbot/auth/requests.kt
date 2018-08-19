@@ -144,3 +144,15 @@ class SendMessage(authInfo: AuthInfo, msg: WXMessage) : JSONRequest<SendMessageB
     @WXRequestFiled("pass_ticket")
     val passTicket = authInfo.ticket
 }
+
+class QueryContact(authInfo: AuthInfo) : WXRequest("", Method.GET) {
+    override val uri: String = "https://%s/cgi-bin/mmwebwx-bin/webwxgetcontact".format(authInfo.config.host)
+    @WXRequestFiled("skey")
+    val skey = authInfo.skey
+    @WXRequestFiled("lang")
+    val language = "zh_CN"
+    @WXRequestFiled("r")
+    val rt = System.currentTimeMillis()
+    @WXRequestFiled("seq")
+    val seq = 0
+}

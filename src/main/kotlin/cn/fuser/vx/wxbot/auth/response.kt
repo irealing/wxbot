@@ -1,5 +1,6 @@
 package cn.fuser.vx.wxbot.auth
 
+import cn.fuser.vx.wxbot.Member
 import com.alibaba.fastjson.annotation.JSONField
 import java.util.concurrent.locks.ReentrantLock
 
@@ -96,3 +97,8 @@ data class SyncCheckRet(val retCode: Int, val selector: Int)
  * @param localID
  * */
 data class SendRet(@JSONField(name = "BaseResponse") val baseResponse: BaseResponse, @JSONField(name = "MsgID") val msgID: String, @JSONField(name = "LocalID") val localID: String)
+
+/**
+ * 通讯录
+ * */
+data class Contact(@JSONField(name = "BaseResponse") val baseResponse: BaseResponse, @JSONField(name = "Count") val count: Int, @JSONField(name = "MemberList") val list: List<Member>)

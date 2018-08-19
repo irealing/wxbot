@@ -1,5 +1,6 @@
 package cn.fuser.vx.wxbot.auth
 
+import cn.fuser.vx.wxbot.Member
 import cn.fuser.vx.wxbot.User
 
 /**
@@ -12,7 +13,7 @@ class MessageFactory private constructor(private val user: User) {
         }
     }
 
-    fun testMessage(to: String, content: String): WXMessage {
+    fun textMessage(to: String, content: String): WXMessage {
         /**
          * 创建文本消息
          * @see WXMessage
@@ -21,4 +22,10 @@ class MessageFactory private constructor(private val user: User) {
          * */
         return WXMessage.textMessage(user.userName, to, content)
     }
+
+    /**
+     * 创建文本消息
+     * @see textMessage
+     * */
+    fun textMessage(to: Member, content: String): WXMessage = textMessage(to.userName, content)
 }
