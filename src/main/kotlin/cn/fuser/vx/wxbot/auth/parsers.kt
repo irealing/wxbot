@@ -5,6 +5,8 @@ import cn.fuser.tool.net.NetLoader
 import cn.fuser.tool.net.ResponseParser
 import cn.fuser.vx.wxbot.AuthException
 import cn.fuser.vx.wxbot.BaseTextRespParser
+import cn.fuser.vx.wxbot.InitReply
+import com.alibaba.fastjson.JSON
 import okhttp3.Response
 import org.apache.log4j.Logger
 import java.io.FileOutputStream
@@ -30,11 +32,11 @@ class ScanStatusParser : BaseTextRespParser<ScanStatus>() {
     override fun parse(resp: Response): ScanStatus = ScanStatus(parseMap(resp))
 }
 
-class LoginRespParser : ResponseParser<LoginReply> {
+class LoginRespParser : ResponseParser<AuthInfo> {
     private val ticketRegex = Pattern.compile("<pass_ticket>(.+)</pass_ticket>")
     private val skeyRegex = Pattern.compile("<skey>(.+)</skey>")
     private val logger = Logger.getLogger(this::class.simpleName)
-    override fun parse(resp: Response): LoginReply {
+    override fun parse(resp: Response): AuthInfo {
         val body = resp.body()?.string()
         val host = resp.request().url().host() ?: ""
         logger.debug(body)
@@ -44,6 +46,13 @@ class LoginRespParser : ResponseParser<LoginReply> {
         val cookies = NetLoader.queryCookie(resp.request().url())
         val uin = cookies.find { it.name() == "wxuin" }?.value() ?: throw AuthException("uin not found")
         val sid = cookies.find { it.name() == "wxsid" }?.value() ?: throw AuthException("sid not found")
-        return LoginReply(uin, sid, ticket.group(1), skey.group(1), config = LoginReply.Config(host))
+        return AuthInfo(uin, sid, ticket.group(1), skey.group(1), config = AuthInfo.Config(host))
+    }
+}
+
+class InitResponseParser : ResponseParser<InitReply> {
+    override fun parse(resp: Response): InitReply {
+        val text = resp.body()?.string() ?: throw NetError("empty response %s".format(resp.request().url()))
+        return JSON.parseObject(text, InitReply::class.java)
     }
 }
