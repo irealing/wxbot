@@ -126,7 +126,7 @@ class WXJSONReqParser<in T> : RequestParser<JSONRequest<T>> {
      * 生成JSON 请求
      * */
     private val jsonType = MediaType.parse("application/json; charset=utf-8")
-
+    private val logger = Logger.getLogger(this::class.simpleName)
     override fun parse(o: JSONRequest<T>): Request {
         val url = parseURL(o)
         val builder = Request.Builder().url(url)
@@ -134,6 +134,7 @@ class WXJSONReqParser<in T> : RequestParser<JSONRequest<T>> {
         builder.addHeader("Referer", BASE_URL)
         val json = JSON.toJSONString(o.data) ?: throw FormatError("failed to parse object to JSON string")
         val body = RequestBody.create(jsonType, json) ?: throw FormatError("build RequestBody error")
+        logger.debug("JSON request %s".format(json))
         return builder.post(body).build()
     }
 

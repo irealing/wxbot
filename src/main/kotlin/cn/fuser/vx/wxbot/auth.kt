@@ -19,6 +19,7 @@ class AuthValidator {
 
     private fun waitLogin(uuid: UUIDReply): AuthInfo {
         while (true) {
+            logger.info("waiting login ...")
             val status = lookUpScan(uuid)
             logger.info("QRCode scan result %s".format(status.code))
             if (status.success) {

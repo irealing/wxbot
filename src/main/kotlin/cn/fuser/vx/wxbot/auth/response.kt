@@ -29,17 +29,28 @@ class ScanStatus(data: Map<String, String>) : TextReply(data) {
     val success = code == 200
 }
 
+/**
+ * 权限认证信息
+ * */
 data class AuthInfo(val wxuin: String, val wxsid: String, val ticket: String, val skey: String, val config: Config) {
     data class Config(val host: String)
 }
 
+/**
+ * 消息同步校验码元素对象
+ * */
 data class SyncKey(@JSONField(name = "Key") val key: Int, @JSONField(name = "Val") val value: Long)
 
+/**
+ * SyncKey 消息同步校验码
+ * */
 class SyncCheckKey(@JSONField(name = "Count") var count: Int, @JSONField(name = "List") val list: MutableList<SyncKey>) {
     private val locker = ReentrantLock(true)
 
-
     fun syncKey(): String {
+        /**
+         * 生成校验码字符串
+         * */
         locker.lock()
         val builder = StringBuilder()
         var tag = false
@@ -63,7 +74,25 @@ class SyncCheckKey(@JSONField(name = "Count") var count: Int, @JSONField(name = 
     }
 
     fun validate(): Boolean = !this.list.isEmpty()
+    override fun toString(): String {
+        return this.syncKey()
+    }
 }
 
 class BaseResponse(@JSONField(name = "Ret") val ret: Int, @JSONField(name = "ErrMsg") val errMsg: String)
+/**
+ * 消息同步结果
+ * @constructor
+ * @param retCode 0/正常;
+ * @param selector 0/正常;2/有新消息;
+ * */
 data class SyncCheckRet(val retCode: Int, val selector: Int)
+
+/**
+ * 消息发送结果对象
+ * @constructor
+ * @param baseResponse
+ * @param msgID
+ * @param localID
+ * */
+data class SendRet(@JSONField(name = "BaseResponse") val baseResponse: BaseResponse, @JSONField(name = "MsgID") val msgID: String, @JSONField(name = "LocalID") val localID: String)

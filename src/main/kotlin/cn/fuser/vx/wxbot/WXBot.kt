@@ -11,11 +11,19 @@ class WXBot(private val authInfo: AuthInfo) {
     var shutDown = false
     private val logger = Logger.getLogger(this::class.simpleName)
     private val syncTask = Thread(SyncRunnable(this))
+    private val user = initBot()
+    val messageFactory: MessageFactory
+        get() = MessageFactory.create(user)
 
-    init {
+    private fun initBot(): User {
+        /**
+         * 初始化并获取当前用户信息
+         * */
         val ret = NetLoader.load(WXInitRequest(authInfo), WXJSONReqParser(), InitResponseParser())
         ret.syncCheckKey ?: throw NetError("syncKey not found")
+        logger.info("remake sync-check-key")
         syncKey.remake(ret.syncCheckKey.list)
+        return ret.user
     }
 
     fun checkSync(): SyncCheckRet {
@@ -50,5 +58,13 @@ class WXBot(private val authInfo: AuthInfo) {
 
     fun shutdown() {
         this.shutDown = true
+    }
+
+    fun send(wm: WXMessage): SendRet {
+        /**
+         * 发送消息
+         * */
+        val parser = JSONRespParser({ JSON.parseObject(it, SendRet::class.java) })
+        return NetLoader.loadJSON(SendMessage(authInfo, wm), parser)
     }
 }

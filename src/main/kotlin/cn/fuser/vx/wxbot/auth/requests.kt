@@ -2,6 +2,7 @@ package cn.fuser.vx.wxbot.auth
 
 import cn.fuser.vx.wxbot.*
 import com.alibaba.fastjson.annotation.JSONField
+import java.util.*
 import javax.xml.ws.WebFault
 
 /**
@@ -85,7 +86,7 @@ class SyncCheckRequest(authInfo: AuthInfo, synk: SyncCheckKey) : WXRequest("", M
 
 class BaseRequest(authInfo: AuthInfo) {
     @JSONField(name = "Uin")
-    val uin: String = authInfo.wxuin
+    val uin = authInfo.wxuin
     @JSONField(name = "Sid")
     val sid = authInfo.wxsid
     @JSONField(name = "Skey")
@@ -105,4 +106,41 @@ class WXSyncRequest(authInfo: AuthInfo, syncKey: SyncCheckKey) : JSONRequest<WXS
     val sid = authInfo.wxsid
     @WXRequestFiled("skey")
     val skey = authInfo.skey
+}
+
+class WXMessage(@JSONField(name = "Type") val type: Int, @JSONField(name = "Content") val content: String, @JSONField(name = "FromUserName") val from: String, @JSONField(name = "ToUserName") val to: String) {
+    /**
+     * 微信发送消息消息内容对象
+     * */
+    @JSONField(name = "ClientMsgId")
+    val clientMsgID = ((System.currentTimeMillis() * 0x3e8) + (Random().nextLong() and 0x270f)).toString()
+    @JSONField(name = "LocalID")
+    val localID = clientMsgID
+
+    companion object {
+        fun textMessage(from: String, to: String, content: String): WXMessage {
+            /**
+             * 文本消息
+             * @param from 发送者用户名
+             * @param to 接收用户名
+             * @param content 消息内容
+             * */
+            return WXMessage(1, content, from, to)
+        }
+    }
+}
+
+class SendMessageBody(authInfo: AuthInfo, @JSONField(name = "Msg") val msg: WXMessage) {
+    @JSONField(name = "BaseRequest")
+    val baseRequest = BaseRequest(authInfo)
+    @JSONField(name = "Scene")
+    val scence = 0
+}
+
+class SendMessage(authInfo: AuthInfo, msg: WXMessage) : JSONRequest<SendMessageBody>(SendMessageBody(authInfo, msg)) {
+    override val uri: String = "https://%s/cgi-bin/mmwebwx-bin/webwxsendmsg".format(authInfo.config.host)
+    @WXRequestFiled("lang")
+    val language = "zh_CN"
+    @WXRequestFiled("pass_ticket")
+    val passTicket = authInfo.ticket
 }
