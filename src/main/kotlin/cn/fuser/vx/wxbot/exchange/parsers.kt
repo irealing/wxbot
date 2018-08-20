@@ -9,8 +9,10 @@ import cn.fuser.vx.wxbot.InitReply
 import com.alibaba.fastjson.JSON
 import okhttp3.Response
 import org.apache.log4j.Logger
+import java.awt.image.BufferedImage
 import java.io.FileOutputStream
 import java.util.regex.Pattern
+import javax.imageio.ImageIO
 
 class UUIDParser : BaseTextRespParser<UUIDReply>() {
     /**
@@ -19,12 +21,9 @@ class UUIDParser : BaseTextRespParser<UUIDReply>() {
     override fun parse(resp: Response): UUIDReply = UUIDReply(parseMap(resp))
 }
 
-class QRCodeParser : ResponseParser<String> {
-    override fun parse(resp: Response): String {
-        val filename = "qr_%d.jpg".format(System.currentTimeMillis())
-        val output = FileOutputStream(filename)
-        output.write(resp.body()?.bytes())
-        return filename
+class QRCodeParser : ResponseParser<BufferedImage> {
+    override fun parse(resp: Response): BufferedImage {
+        return ImageIO.read(resp.body()?.byteStream())
     }
 }
 
@@ -63,8 +62,10 @@ class SyncCheckParser : ResponseParser<SyncCheckRet> {
         val text = resp.body()?.string() ?: throw NetError("empty response %s".format(resp.request().url()))
         val ret = regex.findAll(text)
         if (ret.count() < 2) throw NetError("error response")
-        val retCode = ret.find { it.groupValues[1] == "retcode" }?.groupValues?.get(2)?.toInt() ?: throw NetError("error response")
-        val selector = ret.find { it.groupValues[1] == "selector" }?.groupValues?.get(2)?.toInt() ?: throw NetError("error response")
+        val retCode = ret.find { it.groupValues[1] == "retcode" }?.groupValues?.get(2)?.toInt()
+                ?: throw NetError("error response")
+        val selector = ret.find { it.groupValues[1] == "selector" }?.groupValues?.get(2)?.toInt()
+                ?: throw NetError("error response")
         return SyncCheckRet(retCode, selector)
     }
 }

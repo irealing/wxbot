@@ -4,9 +4,15 @@ import cn.fuser.tool.net.NetLoader
 import cn.fuser.tool.net.ResponseParser
 import cn.fuser.vx.wxbot.exchange.*
 import org.apache.log4j.Logger
+import java.awt.image.BufferedImage
 
 class AuthException(message: String) : Exception(message)
-class AuthValidator {
+/**
+ * 权限校验工具
+ * @constructor
+ * @param handler 处理二维码回调
+ * */
+class AuthValidator(private val handler: (BufferedImage) -> Unit) {
     /**
      * 查询获取UUID
      * */
@@ -15,13 +21,13 @@ class AuthValidator {
     /**
      *下载二维码
      **/
-    private fun getQRCode(uuid: UUIDReply): String = NetLoader.load(GetQRCode(uuid), WXRequestParser(), QRCodeParser())
+    private fun getQRCode(uuid: UUIDReply): BufferedImage = NetLoader.load(GetQRCode(uuid), WXRequestParser(), QRCodeParser())
 
     private val logger = Logger.getLogger(this::class.simpleName)
     fun validate(): AuthInfo {
         val uuid = getUUID()
-        val qrFile = getQRCode(uuid)
-        logger.warn("PLEASE SCAN QR-CODE FILE %s".format(qrFile))
+        val qr = getQRCode(uuid)
+        this.handler.invoke(qr)
         return waitLogin(uuid)
     }
 

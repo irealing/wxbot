@@ -1,5 +1,6 @@
 package cn.fuser.tool.net
 
+import cn.fuser.vx.wxbot.Config
 import cn.fuser.vx.wxbot.JSONRequest
 import cn.fuser.vx.wxbot.JSONRespParser
 import cn.fuser.vx.wxbot.WXJSONReqParser
@@ -28,7 +29,7 @@ object NetLoader {
     /**
      * HTTP请求工具
      * */
-    private val readTimeout: Long = 30
+    private const val readTimeout: Long = Config.httpReadTimeout
     private val http = buildClient()
     private val logger = Logger.getLogger(this::class.simpleName)
     private fun buildClient(): OkHttpClient {
@@ -42,7 +43,9 @@ object NetLoader {
         logger.info("request %s".format(req.url().toString()))
         val resp = http.newCall(req).execute() ?: throw NetError("请求失败!")
         if (handleStatus && !resp.isSuccessful) throw NetError("请求异常:{}".format(resp.code()))
-        return rp.parse(resp)
+        val ret = rp.parse(resp)
+        resp.close()
+        return ret
     }
 
     fun queryCookie(url: String): List<Cookie> {

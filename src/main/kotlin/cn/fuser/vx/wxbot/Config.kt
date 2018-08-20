@@ -7,4 +7,6 @@ object Config {
         if (n < 0) n = -n
         return String.format("e%s", n.toString())
     }
+
+    const val httpReadTimeout = 30L
 }

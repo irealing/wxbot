@@ -1,6 +1,7 @@
 package cn.fuser.tool.net
 
 
+import java.awt.image.BufferedImage
 import java.io.InputStream
 import java.io.PrintStream
 import javax.imageio.ImageIO
@@ -12,9 +13,9 @@ const val BLACK = "  "
 /**
  * 二维码输出工具
  * */
-class QRPrinter(input: InputStream) {
+class QRPrinter(private val img: BufferedImage) {
+    constructor(input: InputStream) : this(ImageIO.read(input))
 
-    private val img = ImageIO.read(input)
     private fun qrString(size: Int = 37, padding: Int = 3): String {
         val builder = StringBuffer()
         val times = img.width / (size + padding * 2)
