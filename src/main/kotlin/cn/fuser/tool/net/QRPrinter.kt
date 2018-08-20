@@ -1,9 +1,8 @@
 package cn.fuser.tool.net
 
 
-import cn.fuser.vx.wxbot.RGB
 import java.io.InputStream
-import java.io.PrintWriter
+import java.io.PrintStream
 import javax.imageio.ImageIO
 
 
@@ -37,7 +36,14 @@ class QRPrinter(input: InputStream) {
         return builder.toString()
     }
 
-    fun print(writer: PrintWriter) {
-        writer.write(qrString())
+    fun print(writer: PrintStream) {
+        writer.println(qrString())
+        writer.flush()
+    }
+
+    private class RGB(value: Int) {
+        val r = (value shr 16) and 0xff
+        val g = (value shr 8) and 0xff
+        val b = value and 0xff
     }
 }
