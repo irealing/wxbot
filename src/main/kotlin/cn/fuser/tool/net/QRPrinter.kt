@@ -9,7 +9,11 @@ import javax.imageio.ImageIO
 const val BLOCK = "MM"
 const val BLACK = "  "
 
+/**
+ * 二维码输出工具
+ * */
 class QRPrinter(input: InputStream) {
+
     private val img = ImageIO.read(input)
     private fun qrString(size: Int = 37, padding: Int = 3): String {
         val builder = StringBuffer()
@@ -30,14 +34,14 @@ class QRPrinter(input: InputStream) {
             builder.append("\n")
         }
         (0..size + 2).forEach {
-            builder.append(BLOCK)
+            builder.append(BLACK)
         }
         builder.append("\n")
         return builder.toString()
     }
 
-    fun print(writer: PrintStream) {
-        writer.println(qrString())
+    fun print(writer: PrintStream, size: Int = 37, padding: Int = 3) {
+        writer.println(qrString(size = size, padding = padding))
         writer.flush()
     }
 
