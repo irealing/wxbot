@@ -2,7 +2,7 @@ package cn.fuser.vx.wxbot
 
 import cn.fuser.tool.net.NetError
 import cn.fuser.tool.net.NetLoader
-import cn.fuser.vx.wxbot.auth.*
+import cn.fuser.vx.wxbot.exchange.*
 import com.alibaba.fastjson.JSON
 import org.apache.log4j.Logger
 

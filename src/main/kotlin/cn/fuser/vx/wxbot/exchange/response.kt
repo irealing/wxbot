@@ -1,4 +1,4 @@
-package cn.fuser.vx.wxbot.auth
+package cn.fuser.vx.wxbot.exchange
 
 import cn.fuser.vx.wxbot.Member
 import com.alibaba.fastjson.annotation.JSONField

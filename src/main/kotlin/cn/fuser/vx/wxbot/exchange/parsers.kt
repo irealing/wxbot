@@ -1,4 +1,4 @@
-package cn.fuser.vx.wxbot.auth
+package cn.fuser.vx.wxbot.exchange
 
 import cn.fuser.tool.net.NetError
 import cn.fuser.tool.net.NetLoader

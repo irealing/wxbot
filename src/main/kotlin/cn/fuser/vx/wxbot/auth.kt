@@ -2,7 +2,7 @@ package cn.fuser.vx.wxbot
 
 import cn.fuser.tool.net.NetLoader
 import cn.fuser.tool.net.ResponseParser
-import cn.fuser.vx.wxbot.auth.*
+import cn.fuser.vx.wxbot.exchange.*
 import org.apache.log4j.Logger
 
 class AuthException(message: String) : Exception(message)
@@ -34,7 +34,7 @@ class AuthValidator {
                 logger.info("login redirect uri %s".format(status.redirectURI))
                 return login(status)
             }
-            if (status.code == 400) throw AuthException("auth error 400")
+            if (status.code == 400) throw AuthException("exchange error 400")
         }
     }
 

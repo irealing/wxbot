@@ -1,9 +1,8 @@
-package cn.fuser.vx.wxbot.auth
+package cn.fuser.vx.wxbot.exchange
 
 import cn.fuser.vx.wxbot.*
 import com.alibaba.fastjson.annotation.JSONField
 import java.util.*
-import javax.xml.ws.WebFault
 
 /**
  * 获取登录UUID请求

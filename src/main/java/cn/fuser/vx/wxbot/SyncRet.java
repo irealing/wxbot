@@ -1,6 +1,6 @@
 package cn.fuser.vx.wxbot;
 
-import cn.fuser.vx.wxbot.auth.SyncCheckKey;
+import cn.fuser.vx.wxbot.exchange.SyncCheckKey;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import java.util.List;
