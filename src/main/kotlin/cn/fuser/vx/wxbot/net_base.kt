@@ -7,6 +7,7 @@ import cn.fuser.tool.net.ResponseParser
 import com.alibaba.fastjson.JSON
 import okhttp3.*
 import org.apache.log4j.Logger
+import java.io.File
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
@@ -21,14 +22,15 @@ enum class Method {
      * @author Memory_Leak<irealing@163.com>
      * */
     GET,
-    POST
+    POST,
+    OPTIONS
 }
 
 /**
  * 微信请求对象基类
  * @author Memory_Leak<irealing@163.com>
  * */
-open class WXRequest(open val uri: String, val method: Method)
+open class WXRequest(open val uri: String, open val method: Method, open val withFile: Boolean = false)
 
 /**
  * JSON请求对象
@@ -44,7 +46,7 @@ open class JSONRequest<out T>(open val uri: String, val method: Method, val data
  * */
 @Target(AnnotationTarget.PROPERTY)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class WXRequestFiled(val key: String)
+annotation class WXRequestFiled(val key: String, val isFile: Boolean = false)
 
 class WXRequestParser<in T : WXRequest> : RequestParser<T> {
 
@@ -52,6 +54,7 @@ class WXRequestParser<in T : WXRequest> : RequestParser<T> {
     override fun parse(o: T): Request = when (o.method) {
         Method.GET -> parseGET(o)
         Method.POST -> parsePOST(o)
+        Method.OPTIONS -> parseOptions(o)
     }
 
     private fun parseGET(o: T): Request {
@@ -66,6 +69,7 @@ class WXRequestParser<in T : WXRequest> : RequestParser<T> {
     }
 
     private fun parsePOST(o: T): Request {
+        if (o.withFile) return postWithFile(o)
         val builder = Request.Builder().url(o.uri).get().header("User-Agent", USER_AGENT)
         builder.header("Referer", BASE_URL)
         val body = FormBody.Builder()
@@ -76,12 +80,36 @@ class WXRequestParser<in T : WXRequest> : RequestParser<T> {
         return builder.build()
     }
 
+    private fun postWithFile(o: T): Request {
+        val builder = Request.Builder().url(o.uri).header("User-Agent", USER_AGENT).header("Referer", BASE_URL)
+        val body = MultipartBody.Builder().setType(MultipartBody.FORM)
+        body::class.memberProperties.forEach {
+            val cfg = it.findAnnotation<WXRequestFiled>() ?: return@forEach
+            if (!cfg.isFile) body.addFormDataPart(cfg.key, it.getter.call(o)?.toString() ?: "")
+            val filename = it.getter.call(o)?.toString() ?: throw FormatError("filename not found")
+            body.addFormDataPart(cfg.key, filename, RequestBody.create(MediaType.get("image/jpg"), File(filename)))
+        }
+        return builder.post(body.build()).build()
+    }
+
+    private fun parseOptions(o: T): Request {
+        val urlBuilder = HttpUrl.parse(o.uri)?.newBuilder() ?: throw NetError("地址异常: %s".format(o.uri))
+        parseParams(o).forEach {
+            urlBuilder.addQueryParameter(it.key, it.value)
+        }
+        val builder = Request.Builder().url(urlBuilder.build()).method("OPTIONS", null)
+        builder.header("User-Agent", USER_AGENT)
+        builder.header("Referer", BASE_URL)
+        return builder.build()
+    }
+
     private fun parseParams(o: T): Map<String, String> {
         val ret = mutableMapOf<String, String>()
         val iter = o::class.memberProperties.iterator()
         while (iter.hasNext()) {
             val filed = iter.next()
-            val cfg = filed.annotations.find { it.annotationClass == WXRequestFiled::class }as? WXRequestFiled ?: continue
+            val cfg = filed.annotations.find { it.annotationClass == WXRequestFiled::class }as? WXRequestFiled
+                    ?: continue
             ret[cfg.key] = filed.getter.call(o)?.toString() ?: ""
         }
         return ret

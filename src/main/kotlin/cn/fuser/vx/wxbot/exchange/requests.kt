@@ -1,7 +1,12 @@
 package cn.fuser.vx.wxbot.exchange
 
+import cn.fuser.tool.net.NetLoader
 import cn.fuser.vx.wxbot.*
+import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.annotation.JSONField
+import org.apache.commons.codec.digest.DigestUtils
+import java.io.File
+import java.io.FileInputStream
 import java.util.*
 
 /**
@@ -154,4 +159,52 @@ class QueryContact(authInfo: AuthInfo) : WXRequest("", Method.GET) {
     val rt = System.currentTimeMillis()
     @WXRequestFiled("seq")
     val seq = 0
+}
+
+open class WXUploadBase(authInfo: AuthInfo) : WXRequest("", Method.OPTIONS) {
+    override val uri: String = "https://file.%s/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json".format(authInfo.config.host)
+}
+
+class UploadMediaRequest(authInfo: AuthInfo, file: File, to: String, from: String) {
+    @JSONField(name = "BaseRequest")
+    val baseRequest = BaseRequest(authInfo)
+    @JSONField(name = "ClientMediaId")
+    val clientMediaID = System.currentTimeMillis()
+    @JSONField(name = "DataLen")
+    val dataLen = file.length()
+    @JSONField(name = "FileMd5")
+    val fileMD5 = DigestUtils.md5Hex(FileInputStream(file))
+    @JSONField(name = "FromUserName")
+    val fromUserName = from
+    @JSONField(name = "MediaType")
+    val mediaType = 4
+    @JSONField(name = "StartPos")
+    val startPost = 0
+    @JSONField(name = "ToUserName")
+    val toUserName = to
+    @JSONField(name = "TotalLen")
+    val totalLen = dataLen
+    @JSONField(name = "UploadType")
+    val uploadType = 2
+}
+
+class WXUploadFile(auth: AuthInfo, file: File, to: String, from: String) : WXUploadBase(auth) {
+    override val withFile = true
+    override val method = Method.POST
+    @WXRequestFiled("id")
+    val id = "WU_FILE_0"
+    @WXRequestFiled("name")
+    val name = file.name
+    @WXRequestFiled("size")
+    val size = file.length()
+    @WXRequestFiled("mediatype")
+    val type = "pic"
+    @WXRequestFiled("webwx_data_ticket")
+    val webWXDataTicket = NetLoader.queryCookie(this.uri).find { it.name() == "webwx_data_ticket" }?.value() ?: ""
+    @WXRequestFiled("pass_ticket")
+    val passTicket = auth.ticket
+    @WXRequestFiled("filename", isFile = true)
+    val file = file.path
+    @WXRequestFiled("uploadmediarequest")
+    val uploadMediaRequest = JSON.toJSONString(UploadMediaRequest(auth, file, to, from))
 }
