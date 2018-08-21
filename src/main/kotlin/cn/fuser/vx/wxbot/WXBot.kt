@@ -5,7 +5,6 @@ import cn.fuser.tool.net.NetError
 import cn.fuser.tool.net.NetLoader
 import cn.fuser.vx.wxbot.exchange.*
 import com.alibaba.fastjson.JSON
-import org.apache.log4j.Logger
 import java.io.File
 
 /**
@@ -14,7 +13,6 @@ import java.io.File
 class WXBot(private val authInfo: AuthInfo) {
     private val syncKey: SyncCheckKey = SyncCheckKey(0, mutableListOf())
     var shutDown = false
-    private val logger = Logger.getLogger(this::class.simpleName)
     private val syncTask = Thread(SyncRunnable(this))
     private val user = initBot()
     private val messageCallback = mutableListOf<MessageCallback>()
@@ -75,6 +73,7 @@ class WXBot(private val authInfo: AuthInfo) {
      * 关闭后台同步线程
      * */
     fun shutdown() {
+        Log.warn("SHUTDOWN")
         this.shutDown = true
     }
 
