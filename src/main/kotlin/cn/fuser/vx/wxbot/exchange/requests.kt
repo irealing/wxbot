@@ -190,7 +190,6 @@ class UploadMediaRequest(authInfo: AuthInfo, file: File, to: String, from: Strin
 class WXUploadFile(auth: AuthInfo, file: File, to: String, from: String) : WXRequest("", Method.POST) {
     override val uri: String = "https://file.%s/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json".format(auth.config.host)
     override val withFile = true
-    override val method = Method.POST
     @WXRequestFiled("id")
     val id = "WU_FILE_0"
     @WXRequestFiled("name")

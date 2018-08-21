@@ -185,10 +185,8 @@ class WXJSONReqParser<in T> : RequestParser<JSONRequest<T>> {
 }
 
 class JSONRespParser<out T>(private val converter: (String) -> T) : ResponseParser<T> {
-    private val logger = Logger.getLogger(this::class.simpleName)
     override fun parse(resp: Response): T {
         val text = resp.body()?.string() ?: throw NetError("empty response")
-        logger.debug("json response %s".format(text))
         return this.converter(text)
     }
 }
