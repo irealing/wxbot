@@ -87,7 +87,7 @@ class WXBot(private val authInfo: AuthInfo) {
         return NetLoader.loadJSON(SendMessage(authInfo, msg), JSONRespParser { JSON.parseObject(it, SendRet::class.java) })
     }
 
-    fun sendMsg(to: String, img: File): ImgMsgRet {
+    fun sendImg(to: String, img: File): ImgMsgRet {
         logger.info("send img(%s) to %s".format(img.path, to))
         val uploadReq = WXUploadFile(authInfo, img, to, user.userName)
         logger.info("upload file %s".format(img.path))

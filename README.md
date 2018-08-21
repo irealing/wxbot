@@ -8,21 +8,21 @@ wxbot是使用Kotlin基于网页版微信开发的微信SDK。
 package cn.fuser.vx.wxbot
 
 import cn.fuser.tool.net.QRPrinter
+import java.io.File
 
 fun main(args: Array<String>) {
-    val authRet = AuthValidator { QRPrinter(it).print(System.err) }.validate()
-    val bot = WXBot(authRet)
+    val auth = AuthValidator({ QRPrinter(it).print(System.err) }).validate()
+    val bot = WXBot(auth)
     bot.heartbeat()
-    val factory = bot.messageFactory
-    val regex = Regex("^@{2}[a-z0-9]{64}$")
-    val simpleMessage = SimpleMessageHandler({
-        if (it.msgType == 1) {
-            val content = if (regex.matches(it.fromUserName)) it.content.substringAfter("<br/>") else it.content
-            bot.send(factory.textMessage(it.fromUserName, content))
-        }
+    val members = bot.contact().list.filter { it.userName.startsWith("@@") }
+    members.forEach({
+        // 发送文本消息    
+        bot.sendText(it.userName, it.userName)
+        // 发送图片消息
+        bot.sendImg(it.userName, File("****"))
     })
-    bot.registerHandler(simpleMessage)
 }
+
 ```
 
 author: [@Memory_Leak](mailto:irealing@163.com)
