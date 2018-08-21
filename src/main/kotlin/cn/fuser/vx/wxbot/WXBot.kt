@@ -16,8 +16,6 @@ class WXBot(private val authInfo: AuthInfo) {
     private val logger = Logger.getLogger(this::class.simpleName)
     private val syncTask = Thread(SyncRunnable(this))
     private val user = initBot()
-    val messageFactory: MessageFactory
-        get() = MessageFactory.create(user, authInfo)
     private val messageCallback = mutableListOf<MessageCallback>()
 
     private fun initBot(): User {
@@ -80,16 +78,13 @@ class WXBot(private val authInfo: AuthInfo) {
     }
 
     /**
-     * 发送消息
-     * @see WXMessage
-     * @param wm 简单消息
+     * 发送文本消息
+     * @param text
+     * @param to
      * */
-    fun send(wm: WXMessage): SendRet {
-        /**
-         * 发送消息
-         * */
-        val parser = JSONRespParser({ JSON.parseObject(it, SendRet::class.java) })
-        return NetLoader.loadJSON(SendMessage(authInfo, wm), parser)
+    fun sendText(to: String, text: String): SendRet {
+        val msg = WXMessage(1, text, user.userName, to)
+        return NetLoader.loadJSON(SendMessage(authInfo, msg), JSONRespParser { JSON.parseObject(it, SendRet::class.java) })
     }
 
     fun sendMsg(to: String, img: File): ImgMsgRet {
