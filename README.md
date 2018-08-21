@@ -27,7 +27,7 @@ fun main(args: Array<String>) {
 
 #### 转发消息
 
-```json
+```kotlin
 package cn.fuser.vx.wxbot
 
 import cn.fuser.tool.net.Log
