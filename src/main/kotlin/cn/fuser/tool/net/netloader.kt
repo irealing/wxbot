@@ -31,7 +31,6 @@ object NetLoader {
      * */
     private const val readTimeout: Long = Config.httpReadTimeout
     private val http = buildClient()
-    private val logger = Logger.getLogger(this::class.simpleName)
     private fun buildClient(): OkHttpClient {
         val manager = CookieManager()
         manager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
@@ -40,7 +39,7 @@ object NetLoader {
 
     fun <Q, R> load(q: Q, qp: RequestParser<Q>, rp: ResponseParser<R>, handleStatus: Boolean = false): R {
         val req = qp.parse(q)
-        logger.info("request %s".format(req.url().toString()))
+        Log.debug("NetLoader load %s", req.url().toString())
         val resp = http.newCall(req).execute() ?: throw NetError("请求失败!")
         if (handleStatus && !resp.isSuccessful) throw NetError("请求异常:{}".format(resp.code()))
         val ret = rp.parse(resp)

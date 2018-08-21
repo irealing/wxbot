@@ -10,7 +10,6 @@ import com.alibaba.fastjson.JSON
 import okhttp3.Response
 import org.apache.log4j.Logger
 import java.awt.image.BufferedImage
-import java.io.FileOutputStream
 import java.util.regex.Pattern
 import javax.imageio.ImageIO
 

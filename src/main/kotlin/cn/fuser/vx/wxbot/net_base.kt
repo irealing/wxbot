@@ -1,9 +1,6 @@
 package cn.fuser.vx.wxbot
 
-import cn.fuser.tool.net.FormatError
-import cn.fuser.tool.net.NetError
-import cn.fuser.tool.net.RequestParser
-import cn.fuser.tool.net.ResponseParser
+import cn.fuser.tool.net.*
 import com.alibaba.fastjson.JSON
 import okhttp3.*
 import org.apache.log4j.Logger
@@ -187,6 +184,7 @@ class WXJSONReqParser<in T> : RequestParser<JSONRequest<T>> {
 class JSONRespParser<out T>(private val converter: (String) -> T) : ResponseParser<T> {
     override fun parse(resp: Response): T {
         val text = resp.body()?.string() ?: throw NetError("empty response")
+        Log.debug("%s %s", resp.request().url(), text)
         return this.converter(text)
     }
 }

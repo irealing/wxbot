@@ -1,5 +1,6 @@
 package cn.fuser.vx.wxbot
 
+import cn.fuser.tool.net.Log
 import cn.fuser.tool.net.NetError
 import cn.fuser.tool.net.NetLoader
 import cn.fuser.vx.wxbot.exchange.*
@@ -24,7 +25,7 @@ class WXBot(private val authInfo: AuthInfo) {
          * */
         val ret = NetLoader.load(WXInitRequest(authInfo), WXJSONReqParser(), InitResponseParser())
         ret.syncCheckKey ?: throw NetError("syncKey not found")
-        logger.info("remake sync-check-key")
+        Log.info("remake sync-check-key")
         syncKey.remake(ret.syncCheckKey.list)
         return ret.user
     }
@@ -88,9 +89,9 @@ class WXBot(private val authInfo: AuthInfo) {
     }
 
     fun sendImg(to: String, img: File): ImgMsgRet {
-        logger.info("send img(%s) to %s".format(img.path, to))
+        Log.info("send img(%s) to %s", img.path, to)
         val uploadReq = WXUploadFile(authInfo, img, to, user.userName)
-        logger.info("upload file %s".format(img.path))
+        Log.info("upload file %s", img.path)
         val ret = NetLoader.load(uploadReq, WXRequestParser(), JSONRespParser({ JSON.parseObject(it, MediaUploadRet::class.java) }))
         if (ret.baseResponse.ret != 0) throw NetError("upload media failed %s %s".format(img.path, ret.baseResponse.ret))
         val imgMsg = SendImgMsg(user.userName, to, authInfo, ret)
