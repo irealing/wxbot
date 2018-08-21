@@ -112,7 +112,7 @@ class WXSyncRequest(authInfo: AuthInfo, syncKey: SyncCheckKey) : JSONRequest<WXS
     val skey = authInfo.skey
 }
 
-class WXMessage(@JSONField(name = "Type") val type: Int, @JSONField(name = "Content") val content: String, @JSONField(name = "FromUserName") val from: String, @JSONField(name = "ToUserName") val to: String) {
+open class WXMessage(@JSONField(name = "Type") val type: Int, @JSONField(name = "Content") val content: String, @JSONField(name = "FromUserName") val from: String, @JSONField(name = "ToUserName") val to: String) {
     /**
      * 微信发送消息消息内容对象
      * */
@@ -161,11 +161,11 @@ class QueryContact(authInfo: AuthInfo) : WXRequest("", Method.GET) {
     val seq = 0
 }
 
-open class WXUploadBase(authInfo: AuthInfo) : WXRequest("", Method.OPTIONS) {
+/**
+ * 上传文件请求
+ * */
+class UploadMediaRequest(authInfo: AuthInfo, file: File, to: String, from: String) : WXRequest("", Method.POST) {
     override val uri: String = "https://file.%s/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json".format(authInfo.config.host)
-}
-
-class UploadMediaRequest(authInfo: AuthInfo, file: File, to: String, from: String) {
     @JSONField(name = "BaseRequest")
     val baseRequest = BaseRequest(authInfo)
     @JSONField(name = "ClientMediaId")
@@ -188,7 +188,8 @@ class UploadMediaRequest(authInfo: AuthInfo, file: File, to: String, from: Strin
     val uploadType = 2
 }
 
-class WXUploadFile(auth: AuthInfo, file: File, to: String, from: String) : WXUploadBase(auth) {
+class WXUploadFile(val auth: AuthInfo, file: File, to: String, from: String) : WXRequest("", Method.POST) {
+    override val uri: String = "https://file.%s/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json".format(auth.config.host)
     override val withFile = true
     override val method = Method.POST
     @WXRequestFiled("id")
@@ -207,4 +208,41 @@ class WXUploadFile(auth: AuthInfo, file: File, to: String, from: String) : WXUpl
     val file = file.path
     @WXRequestFiled("uploadmediarequest")
     val uploadMediaRequest = JSON.toJSONString(UploadMediaRequest(auth, file, to, from))
+}
+
+class SendImgBody(@JSONField(name = "FromUserName") val from: String, @JSONField(name = "ToUserName") val to: String, uploadRet: MediaUploadRet) {
+    @JSONField(name = "Type")
+    val type = 3
+    @JSONField(name = "MediaId")
+    val mediaId = uploadRet.mediaId
+    @JSONField(name = "ClientMsgId")
+    val clientMsgID = ((System.currentTimeMillis() * 0x3e8) + (Random().nextLong() and 0x270f)).toString()
+    @JSONField(name = "LocalID")
+    val localID = clientMsgID
+    @JSONField(name = "Content")
+    val content: String = ""
+}
+
+class ImgMsgRaw(from: String, to: String, uploadRet: MediaUploadRet, authInfo: AuthInfo) {
+    @JSONField(name = "BaseRequest")
+    val baseResponse = BaseRequest(authInfo)
+    @JSONField(name = "Msg")
+    val msg = SendImgBody(from, to, uploadRet)
+    @JSONField(name = "Scene")
+    val scene = 0
+}
+
+/**
+ * 发送图片消息
+ * */
+class SendImgMsg(from: String, to: String, auth: AuthInfo, uploadRet: MediaUploadRet) : JSONRequest<ImgMsgRaw>("", Method.POST, ImgMsgRaw(from, to, uploadRet, auth)) {
+    override val uri: String = "https://%s/cgi-bin/mmwebwx-bin/webwxsendmsgimg".format(auth.config.host)
+    @WXRequestFiled("fun")
+    val func = "async"
+    @WXRequestFiled("f")
+    val format = "json"
+    @WXRequestFiled("lang")
+    val language = "zh_CN"
+    @WXRequestFiled("pass_ticket")
+    val ticket = auth.ticket
 }

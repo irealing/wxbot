@@ -102,3 +102,12 @@ data class SendRet(@JSONField(name = "BaseResponse") val baseResponse: BaseRespo
  * 通讯录
  * */
 data class Contact(@JSONField(name = "BaseResponse") val baseResponse: BaseResponse, @JSONField(name = "Count") val count: Int, @JSONField(name = "MemberList") val list: List<Member>)
+
+data class MediaUploadRet(
+        @JSONField(name = "BaseResponse") val baseResponse: BaseResponse,
+        @JSONField(name = "CDNThumbImgHeight") val CDNThumbImgHeight: Int,
+        @JSONField(name = "CDNThumbImgWidth") val CDNThumbImgWidth: Int,
+        @JSONField(name = "EncryFileName") val encryFileName: String,
+        @JSONField(name = "MediaId") val mediaId: String,
+        @JSONField(name = "StartPos") val startPost: Int
+)

@@ -30,7 +30,11 @@ class MessageFactory private constructor(private val user: User, private val aut
      * */
     fun textMessage(to: Member, content: String): WXMessage = textMessage(to.userName, content)
 
-    fun makeImageRequest(to: String, file: File): WXUploadFile {
+    fun makeUploadRequest(to: String, file: File): WXUploadFile {
         return WXUploadFile(auth, file, to, user.userName)
+    }
+
+    fun makeImgMsg(to: String, uploadRet: MediaUploadRet): SendImgMsg {
+        return SendImgMsg(user.userName, to, auth, uploadRet)
     }
 }
