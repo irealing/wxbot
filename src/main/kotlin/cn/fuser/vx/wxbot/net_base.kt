@@ -8,6 +8,9 @@ import com.alibaba.fastjson.JSON
 import okhttp3.*
 import org.apache.log4j.Logger
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
@@ -83,14 +86,20 @@ class WXRequestParser<in T : WXRequest> : RequestParser<T> {
     private fun postWithFile(o: T): Request {
         val builder = Request.Builder().url(o.uri).header("User-Agent", USER_AGENT).header("Referer", BASE_URL)
         val body = MultipartBody.Builder().setType(MultipartBody.FORM)
-        body::class.memberProperties.forEach {
+        o::class.memberProperties.forEach {
             val cfg = it.findAnnotation<WXRequestFiled>() ?: return@forEach
-            if (!cfg.isFile) body.addFormDataPart(cfg.key, it.getter.call(o)?.toString() ?: "")
-            val filename = it.getter.call(o)?.toString() ?: throw FormatError("filename not found")
-            body.addFormDataPart(cfg.key, filename, RequestBody.create(MediaType.get("image/jpg"), File(filename)))
+            if (!cfg.isFile) {
+                body.addFormDataPart(cfg.key, it.getter.call(o)?.toString() ?: "")
+            } else {
+                val filename = it.getter.call(o)?.toString() ?: throw FormatError("filename not found")
+                val mimeType = fileType(filename)
+                body.addFormDataPart(cfg.key, filename, RequestBody.create(mimeType, File(filename)))
+            }
         }
         return builder.post(body.build()).build()
     }
+
+    private fun fileType(filename: String): MediaType = MediaType.get(Files.probeContentType(Paths.get(filename)))
 
     private fun parseOptions(o: T): Request {
         val urlBuilder = HttpUrl.parse(o.uri)?.newBuilder() ?: throw NetError("地址异常: %s".format(o.uri))

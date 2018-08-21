@@ -2,14 +2,15 @@ package cn.fuser.vx.wxbot.exchange
 
 import cn.fuser.vx.wxbot.Member
 import cn.fuser.vx.wxbot.User
+import java.io.File
 
 /**
  * 微信消息工厂
  * */
-class MessageFactory private constructor(private val user: User) {
+class MessageFactory private constructor(private val user: User, private val auth: AuthInfo) {
     companion object {
-        fun create(user: User): MessageFactory {
-            return MessageFactory(user)
+        fun create(user: User, auth: AuthInfo): MessageFactory {
+            return MessageFactory(user, auth)
         }
     }
 
@@ -28,4 +29,8 @@ class MessageFactory private constructor(private val user: User) {
      * @see textMessage
      * */
     fun textMessage(to: Member, content: String): WXMessage = textMessage(to.userName, content)
+
+    fun makeImageRequest(to: String, file: File): WXUploadFile {
+        return WXUploadFile(auth, file, to, user.userName)
+    }
 }

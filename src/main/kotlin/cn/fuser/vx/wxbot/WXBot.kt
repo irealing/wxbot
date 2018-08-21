@@ -16,7 +16,7 @@ class WXBot(private val authInfo: AuthInfo) {
     private val syncTask = Thread(SyncRunnable(this))
     private val user = initBot()
     val messageFactory: MessageFactory
-        get() = MessageFactory.create(user)
+        get() = MessageFactory.create(user, authInfo)
     private val messageCallback = mutableListOf<MessageCallback>()
 
     private fun initBot(): User {
@@ -60,7 +60,8 @@ class WXBot(private val authInfo: AuthInfo) {
         val syncParser = JSONRespParser({
             JSON.parseObject(it, SyncRet::class.java)
         })
-        val ret = NetLoader.loadJSON(WXSyncRequest(authInfo, this.syncKey), syncParser) ?: throw NetError("error response")
+        val ret = NetLoader.loadJSON(WXSyncRequest(authInfo, this.syncKey), syncParser)
+                ?: throw NetError("error response")
         this.syncKey.remake(ret.syncKey.list)
         ret.msgList.forEach {
             handleMessage(it)
