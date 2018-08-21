@@ -164,8 +164,7 @@ class QueryContact(authInfo: AuthInfo) : WXRequest("", Method.GET) {
 /**
  * 上传文件请求
  * */
-class UploadMediaRequest(authInfo: AuthInfo, file: File, to: String, from: String) : WXRequest("", Method.POST) {
-    override val uri: String = "https://file.%s/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json".format(authInfo.config.host)
+class UploadMediaRequest(authInfo: AuthInfo, file: File, to: String, from: String) {
     @JSONField(name = "BaseRequest")
     val baseRequest = BaseRequest(authInfo)
     @JSONField(name = "ClientMediaId")
@@ -188,7 +187,7 @@ class UploadMediaRequest(authInfo: AuthInfo, file: File, to: String, from: Strin
     val uploadType = 2
 }
 
-class WXUploadFile(val auth: AuthInfo, file: File, to: String, from: String) : WXRequest("", Method.POST) {
+class WXUploadFile(auth: AuthInfo, file: File, to: String, from: String) : WXRequest("", Method.POST) {
     override val uri: String = "https://file.%s/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json".format(auth.config.host)
     override val withFile = true
     override val method = Method.POST

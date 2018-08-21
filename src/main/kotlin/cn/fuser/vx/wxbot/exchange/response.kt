@@ -111,3 +111,9 @@ data class MediaUploadRet(
         @JSONField(name = "MediaId") val mediaId: String,
         @JSONField(name = "StartPos") val startPost: Int
 )
+
+data class ImgMsgRet(
+        @JSONField(name = "BaseResponse") val baseResponse: BaseResponse,
+        @JSONField(name = "LocalID") val localID: String,
+        @JSONField(name = "MsgID") val msgID: String
+)

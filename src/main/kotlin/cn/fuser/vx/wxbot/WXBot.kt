@@ -5,6 +5,7 @@ import cn.fuser.tool.net.NetLoader
 import cn.fuser.vx.wxbot.exchange.*
 import com.alibaba.fastjson.JSON
 import org.apache.log4j.Logger
+import java.io.File
 
 /**
  * 微信机器人
@@ -89,6 +90,16 @@ class WXBot(private val authInfo: AuthInfo) {
          * */
         val parser = JSONRespParser({ JSON.parseObject(it, SendRet::class.java) })
         return NetLoader.loadJSON(SendMessage(authInfo, wm), parser)
+    }
+
+    fun sendMsg(to: String, img: File): ImgMsgRet {
+        logger.info("send img(%s) to %s".format(img.path, to))
+        val uploadReq = WXUploadFile(authInfo, img, to, user.userName)
+        logger.info("upload file %s".format(img.path))
+        val ret = NetLoader.load(uploadReq, WXRequestParser(), JSONRespParser({ JSON.parseObject(it, MediaUploadRet::class.java) }))
+        if (ret.baseResponse.ret != 0) throw NetError("upload media failed %s %s".format(img.path, ret.baseResponse.ret))
+        val imgMsg = SendImgMsg(user.userName, to, authInfo, ret)
+        return NetLoader.loadJSON(imgMsg, JSONRespParser { JSON.parseObject(it, ImgMsgRet::class.java) })
     }
 
     fun contact(): Contact {
