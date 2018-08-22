@@ -40,8 +40,15 @@ class WXBot(private val authInfo: AuthInfo) {
 
     private class SyncRunnable(private val wxbot: WXBot) : Runnable {
         override fun run() {
+            var counter: Int = 0
             while (!wxbot.shutDown) {
-                wxbot.checkSync()
+                try {
+                    wxbot.checkSync()
+                } catch (e: Exception) {
+                    counter++
+                    Log.warn("check-sync error ()".format(counter), e)
+                    continue
+                }
             }
         }
     }
