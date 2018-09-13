@@ -54,7 +54,7 @@ fun main(args: Array<String>) {
 
 亦可实现`(BufferedImage) -> Unit`传入`AuthValidator`进行其它操作.
 控制台输出二维码效果如下:
-![控制台输出二维码效果](http://vvia.xyz/MlkKPc)
+![控制台输出二维码效果](vvia.xyz/0lyuhe)
 
 
 author: [@Memory_Leak](mailto:irealing@163.com)
