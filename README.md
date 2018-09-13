@@ -48,7 +48,13 @@ fun main(args: Array<String>) {
     })
 }
 ```
+### 关于二维码扫描
 
+`wxbot`根据Python版本的[alishtory/qrcode-terminal](http://vvia.xyz/Mmz2pq)实现了输出二维码为字画的工具`cn.fuser.tool.QRPrinter`，可输出二维码到控制台.
+
+亦可实现`(BufferedImage) -> Unit`传入`AuthValidator`进行其它操作.
+控制台输出二维码效果如下:
+![控制台输出二维码效果](http://vvia.xyz/MlkKPc)
 
 
 author: [@Memory_Leak](mailto:irealing@163.com)
